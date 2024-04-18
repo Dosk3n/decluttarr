@@ -51,8 +51,9 @@ def sonarr():
     # Sonarr get all series
     series = s.get_series()
     log.info(f"Number of Series: {len(series)}")
-    # for s in series:
-    #     log.info(f"id: {s['id']} - title: {s['title']} - sortTitle: {s['sortTitle']} - path: {s['path']} - rootFolderPath: {s['rootFolderPath']}")
+    for s in series:
+        log.info(f"id: {s['id']} - title: {s['title']} - sortTitle: {s['sortTitle']} - path: {s['path']} - rootFolderPath: {s['rootFolderPath']} - imdbId: {s['imdbId']} - tvdbId: {s['tvdbId']}")
+        #log.info(s)
 
 
 
@@ -66,8 +67,15 @@ def sonarr():
     t = TautulliApiHandler(TAUTULLI_HOST, TAUTULLI_API_KEY)
     history = t.get_history(length=50000, media_type="episode", after=x_days_prior_to_today)
     log.info(f"History Events: {len(history['response']['data']['data'])}")
-    # for event in history['response']['data']['data']:
-    #     log.info(f"Epoch: {event['date']} - Date: {datetime.fromtimestamp(event['date']).strftime('%Y-%m-%d')} - User: {event['user']} - Original Title: {event['original_title']} - Grandparent Title: {event['grandparent_title']}")
+    for event in history['response']['data']['data'][:1]:
+        metadata = t.get_metadata(event['rating_key'])
+        log.info(metadata['response']['data']['guids'])
+        if not metadata:
+            sys.exit(1) # Handle this better!
+        log.info(f"Epoch: {event['date']} - Date: {datetime.fromtimestamp(event['date']).strftime('%Y-%m-%d')} - User: {event['user']} - Original Title: {event['original_title']} - parent_guids: {metadata['response']['data']['guids']} - Grandparent Title: {event['grandparent_title']} - grandparent_guids: {metadata['response']['data']['grandparent_guids']}")
+        
+    # items = t.get_metadata()
+    # log.info(items)
 
 try:
     # Check if the config.ini file exists

@@ -30,6 +30,13 @@ class TautulliApiHandler:
     def get_activity(self):
         return self.make_request("get_activity")
 
+    def get_metadata(self, rating_key=0):
+        if rating_key == 0:
+            return False
+        params = {"rating_key": rating_key}
+        return self.make_request("get_metadata", params=params)
+        
+
     def get_history(self, **kwargs):
         params = {}
         for key, value in kwargs.items():
